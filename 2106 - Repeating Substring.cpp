@@ -1,7 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-#define nn '\n'
 const int N = 1e6 + 9;
 const int p1 = 137, mod1 = 127657753, p2 = 277, mod2 = 987654319;
 
@@ -66,29 +65,18 @@ pair<int, int> get_hash(int i, int j) {
   return hs;
 }
 
-string s; 
-pair<pair<int, int>, bool> ok(int l){
-
-   map<pair<int, int>, int>cnt;
-   for(int i = 0; i + l - 1 < s.size(); i++){
-     pair<int, int>p = get_hash(i, i + l - 1);
-     cnt[p]++;
-   }
-
-   for(auto it : cnt){
-     if(it.second > 1){
-        pair<pair<int, int>, bool>p;
-        p.first.first = it.first.first;
-        p.first.second = it.first.second;
-        p.second = 1;
-        return p;
+string s, res;
+bool ok(int len){
+  set<pair<int, int>>st;
+  for(int i = 0; i + len - 1 < s.size(); i++){
+     auto cur = get_hash(i, i + len - 1);
+     if(st.find(cur) != st.end()){
+       res = s.substr(i, len);
+       return true;
      }
-   }
-   pair<pair<int, int>, bool>p;
-   p.first.first = 0;
-   p.first.second = 0;
-   p.second = 0;
-   return p;
+     st.insert(cur);
+  }
+  return false;
 }
 
 int main() {
@@ -99,38 +87,24 @@ int main() {
   cin >> s; 
   build(s);
 
-
-  pair<pair<int, int>, int>ans;
-  int n = s.size(); 
-  int l = 1, r = n;
-
+  int ans = -1, n = s.size();
+  int l = 1, r = n; 
+  
   while(l <= r){
-    int mid = (l + r) >> 1; 
-    //cout << mid << nn;
-    pair<pair<int, int>, bool>p = ok(mid); 
-    if(p.second){
-      ans.first.first = p.first.first;
-      ans.first.second = p.first.second;
-      ans.second = mid;
+    int mid = (l + r) >> 1;
+    if(ok(mid)){
+      ans = mid;
       l = mid + 1;
     }
     else r = mid - 1;
   }
 
-  pair<int, int>x; 
-  x.first = ans.first.first;
-  x.second = ans.first.second;
-
-  int len = ans.second, flag = 0;;
-  for(int i = 0; i + len - 1 < s.size(); i++){
-
-    if(x == get_hash(i, i + len - 1)){
-      cout << s.substr(i, len) << endl;
-      flag = 1;
-      break; 
-    }
+  if(ans == -1){
+    cout << -1 << endl; 
+    return 0;
   }
-  if(!flag){
-     cout << -1 << endl;
-  }
+
+  ok(ans);
+  cout << res << endl;
+  return 0;
 }
